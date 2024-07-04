@@ -44,6 +44,8 @@ double bound(int i, int sumT, int sumV) {
     return sumV;
 }
 
+int lxylazydegree = 0;
+
 int solve() {
     int res = 0;
     Node r = { 0, 0, 0, bound(0, 0, 0) };
@@ -53,26 +55,27 @@ int solve() {
     lxy.insertNum(r.sumV);
     lxy.insertNum(r.maxV);
     while (que.top().maxV > res) {  //堆顶结点的上界大于已知最优值
-        Node n = que.top();
+        lxylazydegree++;
+        Node nd = que.top();
         que.pop();
-        if (n.nxt == M) {
-            res = max(res, n.sumV); //实际最优值
+        if (nd.nxt == M) {
+            res = max(res, nd.sumV); //实际最优值
         }
         else {
-            Node n2 = n;
-            if (n.sumT + hrbs[n.nxt].tim <= T) {  //剪枝
-                n.maxV = bound(n.nxt, n.sumT, n.sumV);
-                if (n.maxV > res) {
-                    n.sumT += hrbs[n.nxt].tim;
-                    n.sumV += hrbs[n.nxt].val;
-                    n.nxt++;
-                    que.push(n);
-                    res = max(res, n.sumV);
+            Node n2 = nd;
+            if (nd.sumT + hrbs[nd.nxt].tim <= T) {  //剪枝
+                nd.maxV = bound(nd.nxt, nd.sumT, nd.sumV);
+                if (nd.maxV > res) {
+                    nd.sumT += hrbs[nd.nxt].tim;
+                    nd.sumV += hrbs[nd.nxt].val;
+                    nd.nxt++;
+                    que.push(nd);
+                    res = max(res, nd.sumV);
                     //cout << n.sumT << " " << n.sumV << " " << n.maxV << endl;
-                    lxy.insertNum(n.sumT);
-                    lxy.insertNum(n.sumV);
-                    lxy.insertNum(n.maxV);
-                    
+                    lxy.insertNum(nd.sumT);
+                    lxy.insertNum(nd.sumV);
+                    lxy.insertNum(nd.maxV);
+
                 }
             }
             n2.maxV = bound(n2.nxt + 1, n2.sumT, n2.sumV);// 不放当前草药时的上界
@@ -92,14 +95,16 @@ int solve() {
 }
 
 void initBranch() {
+    cout << "please input capacity and number of goods" << endl;
     cin >> T >> M;
-    cout << "Please give M examples:" << endl;
+    cout << "Please give "<< M << " examples:" << endl;
     Herb h;
     for (int i = 0; i < M; i++) {
         cin >> h.tim >> h.val;
         hrbs.push_back(h);
     }
     sort(hrbs.begin(), hrbs.end(), greater<Herb>());
-    cout << solve() << endl;
+    cout << "maxval = " << solve() << endl;
+    cout << "step = " << lxylazydegree << endl;
 }
 #endif
