@@ -10,7 +10,7 @@ using namespace std;
 int cost[105];
 int value[105];
 int Time;
-int n;  //记录物品种类
+//int n;  //记录物品种类
 int ans;
 struct Elements {
     int pos;
@@ -70,37 +70,40 @@ struct RecursiveSystem {
     }
 
         
-    void dfs(int pos, int timeLeft, int tans) {
+    void dfs(int pos, int timeLeft, int tans, int BackTrack_n) {
         if(timeLeft < 0) {
             pop();
             return;
         }
-        if(pos == n + 1) {
+        if(pos == BackTrack_n + 1) {
             ans = max(ans, tans);
             pop();
             return;
         }
         //cout << "dfs(" << pos << " + 1," << timeLeft << ")" << endl;
         push(Elements(pos + 1, timeLeft, tans));
-        dfs(pos + 1, timeLeft, tans);   
+        dfs(pos + 1, timeLeft, tans, BackTrack_n);
         if(timeLeft >= cost[pos]) {
             //cout << "dfs(" << pos << " + 1," << timeLeft << " - " << "cost[" << pos <<"]" << " + " << "value[" << pos << "]" << endl;
             push(Elements(pos + 1, timeLeft - cost[pos], tans + value[pos]));
-            dfs(pos + 1, timeLeft - cost[pos], tans + value[pos]);
-            if(!dfs_stack.empty()) {
-                pop();
-            }
+            dfs(pos + 1, timeLeft - cost[pos], tans + value[pos], BackTrack_n);
+            // if(!dfs_stack.empty()) {
+            //     pop();
+            // }
         }
-        
+        if(!dfs_stack.empty()) {
+            pop();
+        }
     }
 
 }sysBackTrack;
 void BackTrack() {
-    cin >> Time >> n;
-    for(int i = 1; i <= n; i++) {
+    int BackTrack_n = 0;
+    cin >> Time >> BackTrack_n;
+    for(int i = 1; i <= BackTrack_n; i++) {
          cin >> cost[i] >> value[i];
     }
-    sysBackTrack.dfs(1, Time, 0);
+    sysBackTrack.dfs(1, Time, 0, BackTrack_n);
     cout << "answer = " << ans << endl;
     cout << "maxDeep = " << sysBackTrack.maxDeep << endl;
     cout << "最大空间  = " << sysBackTrack.maxDeep * sizeof(int) * 3 << " byte" << endl;
